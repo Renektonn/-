@@ -1,13 +1,12 @@
 #include <iostream>
-#include <stack>
 #include <vector>
+#include <stack>
+
 using namespace std;
 
-int main() {
-  string str="(1+2)*(3+4)";
-  stack  <int> sta;
-  vector <int> ans;
-
+string infixToPostfix(string str , vector <int> postfix){
+  stack <char> sta;
+  int oper [4+1]={0};
   for(int i=0;i<str.length();i++){
     switch(str.at(i)){
       case '(' :
@@ -17,6 +16,7 @@ int main() {
       case '-' :
         if(sizeof(sta) == 0){
           sta.push( str.at(i) );
+          oper[]
         }
         else{
           int n=sizeof(sta) / 4 - 1;
@@ -50,9 +50,9 @@ int main() {
       break;
       case ')':
         
-        int n=ans.size()-1;
+        int n=sta.size()-1;
         while(sta.top() != '('){
-          ans.push_back( sta.top() );
+          sta.push( sta.top() );
           sta.pop();
         }
       
@@ -63,7 +63,69 @@ int main() {
     
 
   }
+  return str;
+}
 
-  return 0;
+void postfixCalculate(string str){
+  stack  <int> sta;
+  for(int i=0;i<str.length();i++){
+    int a,b;
+    switch( str.at(i) ){
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        sta.push( str.at(i) - '0');
+      break;
 
+      case '+' :
+        a=sta.top();
+        sta.pop();
+        b=sta.top();
+        sta.pop();
+        sta.push( a+b );
+      break;
+
+      case '-' :
+        a=sta.top();
+        sta.pop();
+        b=sta.top();
+        sta.pop();
+        sta.push( a-b );
+      break;
+
+      case '*' :
+        a=sta.top();
+        sta.pop();
+        b=sta.top();
+        sta.pop();
+        sta.push( a*b );
+      break;
+
+      case '/' :
+        a=sta.top();
+        sta.pop();
+        b=sta.top();
+        sta.pop();
+        sta.push( a/b );
+      break;      
+
+    }
+  }
+  cout<<sta.top();
+}
+
+int main() {
+  string str="(1+2)*(3+4)";
+  vector <int> postfix;
+  infixToPostfix(str,postfix);
+
+  postfixCalculate(str);
+  return 0;  
 }
