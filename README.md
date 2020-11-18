@@ -4,36 +4,65 @@
 
 using namespace std;
 
+int priority(char cha){
+	if(cha=='*' || cha=='/'){
+		return 2;
+	}
+	else{
+		return 1;
+	}
+}
+
+
+void operators(stack <char> sta , char cha , vector <char> ans){
+	if(sizeof(sta) == 0){ 
+        sta.push(cha);
+    }
+    else{//堆疊中運算子優先順序若大於等於讀入的運算子優先順序的話，直接輸出堆疊中的運算子，再將讀入的運算子置入堆疊
+        int n=sizeof(sta) - 1;
+        if(priority(cha) >= priority(sta.top())){ //運算子在堆疊中只能優先序大的壓優先序小的
+        	ans.push_back(cha);
+		}
+		else{
+			while(sta.top()!=null && priority(cha) < priority(sta.top())){
+       			ans.push_back(sta.top());
+       			sta.pop();
+        	}
+		}
+		
+    }
+    
+}
+
+void backBracket(stack <char> sta , vector <char> ans){
+	int n=sta.size()-1;
+    while(sta.top() != '('){
+        ans.push_back( sta.top() );
+        sta.pop();
+    }
+      
+    sta.pop(); //the last is '('
+}
+
 string infixToPostfix(string str , vector <int> postfix){
   stack <char> sta;
-  int oper [4+1]={0};
+  sta.push(null);
+  vector <char> ans;
+  
   for(int i=0;i<str.length();i++){
     switch(str.at(i)){
-      case '(' :
+      
+	  case '(' :
         sta.push( str.at(i) );
       break;
+      
       case '+' :
       case '-' :
-        if(sizeof(sta) == 0){
-          sta.push( str.at(i) );
-          oper[]
-        }
-        else{
-          int n=sizeof(sta) / 4 - 1;
-          while(str.at(n) == '('){
-            n--;
-          }
-        }
-      
-      break;
       case '*' :
       case '/' :
-        if(sizeof(sta) == 0){
-          sta.push( str.at(i) );
-        }
-        //ans.push_back( str.at(i) );
-      
+      	operators(sta , str.at(i) , ans);
       break;
+      
       case '0' :
       case '1' :
       case '2' :
@@ -44,88 +73,16 @@ string infixToPostfix(string str , vector <int> postfix){
       case '7' :
       case '8' :
       case '9' :
-        
         ans.push_back( str.at(i) );
-
       break;
-      case ')':
-        
-        int n=sta.size()-1;
-        while(sta.top() != '('){
-          sta.push( sta.top() );
-          sta.pop();
-        }
       
-        sta.pop();
-
+      case ')':
+      	backBracket(sta,ans);
       break;
     }
     
 
   }
+  
   return str;
-}
-
-void postfixCalculate(string str){
-  stack  <int> sta;
-  for(int i=0;i<str.length();i++){
-    int a,b;
-    switch( str.at(i) ){
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-      case '9':
-        sta.push( str.at(i) - '0');
-      break;
-
-      case '+' :
-        a=sta.top();
-        sta.pop();
-        b=sta.top();
-        sta.pop();
-        sta.push( a+b );
-      break;
-
-      case '-' :
-        a=sta.top();
-        sta.pop();
-        b=sta.top();
-        sta.pop();
-        sta.push( a-b );
-      break;
-
-      case '*' :
-        a=sta.top();
-        sta.pop();
-        b=sta.top();
-        sta.pop();
-        sta.push( a*b );
-      break;
-
-      case '/' :
-        a=sta.top();
-        sta.pop();
-        b=sta.top();
-        sta.pop();
-        sta.push( a/b );
-      break;      
-
-    }
-  }
-  cout<<sta.top();
-}
-
-int main() {
-  string str="(1+2)*(3+4)";
-  vector <int> postfix;
-  infixToPostfix(str,postfix);
-
-  postfixCalculate(str);
-  return 0;  
 }
