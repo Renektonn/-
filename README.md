@@ -4,7 +4,7 @@
 
 using namespace std;
 
-int priority(char cha){
+int priority(char cha){ //c++沒有return居然不會報錯? 
 	if(cha=='*' || cha=='/'){
 		return 3;
 	}
@@ -16,15 +16,27 @@ int priority(char cha){
 			if(cha=='('){
 				return 1;
 			}	
+	return 0;
 }
 
+void backBracket(stack <char> &sta , vector <char> &ans){
+    
+	while(sta.top() != '('){
+        ans.push_back( sta.top() );
+        sta.pop();
+    }
+      
+    sta.pop(); //the last is '('
+}
 
-void operators(char cha , stack <char> sta , vector <char> ans){
-	if(sta.top()=='null'){ 
+void operators(char cha , stack <char> &sta , vector <char> &ans){
+	
+	if(sta.top()==NULL){ 
         sta.push(cha);
     }
-    else{//堆疊中運算子優先順序若大於等於讀入的運算子優先順序的話，直接輸出堆疊中的運算子，再將讀入的運算子置入堆疊
-        if(priority(cha) >= priority(sta.top())){ //運算子在堆疊中只能優先序大的壓優先序小的
+    else//堆疊中運算子優先順序若大於等於讀入的運算子優先順序的話，直接輸出堆疊中的運算子，再將讀入的運算子置入堆疊
+        
+		if(priority(cha) >= priority(sta.top())){ //運算子在堆疊中只能優先序大的壓優先序小的
         	ans.push_back(cha);
 		}
 		else{
@@ -35,27 +47,20 @@ void operators(char cha , stack <char> sta , vector <char> ans){
         	sta.push(cha);
 		}
 		
-    }
     
-}
-
-void backBracket(stack <char> sta , vector <char> ans){
     
-	while(sta.top() != '('){
-        ans.push_back( sta.top() );
-        sta.pop();
-    }
-      
-    sta.pop(); //the last is '('
 }
 
 string infixToPostfix(string str){
-  stack <char> sta;
-  sta.push('null');
+  
   vector <char> ans;
+  stack <char> sta;
+  sta.push(NULL); //c++的null為NULL //還沒報錯 
+  cout<<sta.top();
+  
   
   for(int i=0;i<str.length();i++){
-    switch(str.at(i)){
+	switch(str.at(i)){
       
 	  case '(' :
         sta.push( str.at(i) );
@@ -65,7 +70,7 @@ string infixToPostfix(string str){
       case '-' :
       case '*' :
       case '/' :
-      	operators(str.at(i) , sta , ans);
+		  operators(str.at(i) , sta , ans);
       break;
       
       case '0' :
@@ -78,7 +83,7 @@ string infixToPostfix(string str){
       case '7' :
       case '8' :
       case '9' :
-        ans.push_back( str.at(i) );
+      	ans.push_back( str.at(i) );
       break;
       
       case ')':
@@ -89,11 +94,16 @@ string infixToPostfix(string str){
 
   }
   
+  while(sta.top()!=NULL){
+  	ans.push_back(sta.top());
+  	sta.pop();
+  }
   
-  string result(ans.begin(), ans.end());// I don't know vector
+  
+  string result(ans.begin(), ans.end());//vector <char> to string
   return result;
 }
 int main(){
 	string str=infixToPostfix("1+2*3");
-	cout<<str;
+	//cout<<str;
 }
