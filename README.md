@@ -4,36 +4,81 @@
 
 using namespace std;
 
-string infixToPostfix(string str , vector <int> postfix){
+// 運算子優先序 (先乘除後加減 有括號先算括號)
+int priority(char cha){ //c++沒有return居然不會報錯? 
+	if(cha=='*' || cha=='/'){
+		return 3;
+	}
+	else
+		if(cha=='+' || cha=='-'){
+			return 2;
+		}
+		else
+			if(cha=='('){
+				return 1;
+			}	
+	return 0;
+}
+//遇右括號輸出堆疊中的運算子至左括號
+void backBracket(stack <char> &sta , vector <char> &ans){
+    
+	while(sta.top() != '('){
+        ans.push_back( sta.top() );
+        sta.pop();
+    }
+      
+    sta.pop(); //the last is '('
+}
+
+void operators(char cha , stack <char> &sta , vector <char> &ans){
+	
+	if(sta.top()==NULL){ 
+        
+        sta.push(cha);
+        
+    }
+    else
+        //以下大的小的皆指運算子的優先序
+        //運算子在堆疊中只能大的壓小的
+		if(priority(cha) >= priority(sta.top())){
+		    
+        	sta.push(cha);
+        	
+		}
+		//如遇(小的)想壓(大的) 只好輸出所有大於(小的) 讓(小的)去壓(更小的)
+		else{ 
+			while(sta.top()!=NULL && 
+			priority(cha) < priority( sta.top() ) ){
+       			ans.push_back(sta.top());
+       			sta.pop();
+        	}
+        	sta.push(cha);
+		}
+		
+    
+    
+}
+//中序式轉後敘式
+string infixToPostfix(string str){
+  vector <char> ans;
   stack <char> sta;
-  int oper [4+1]={0};
+  sta.push(NULL); //c++的null為NULL //還沒報錯 
+  
+  
   for(int i=0;i<str.length();i++){
-    switch(str.at(i)){
-      case '(' :
+	switch(str.at(i)){
+      //優先序最小 直接推入堆疊
+	  case '(' :
         sta.push( str.at(i) );
       break;
+      
       case '+' :
       case '-' :
-        if(sizeof(sta) == 0){
-          sta.push( str.at(i) );
-          oper[]
-        }
-        else{
-          int n=sizeof(sta) / 4 - 1;
-          while(str.at(n) == '('){
-            n--;
-          }
-        }
-      
-      break;
       case '*' :
       case '/' :
-        if(sizeof(sta) == 0){
-          sta.push( str.at(i) );
-        }
-        //ans.push_back( str.at(i) );
-      
+		  operators(str.at(i) , sta , ans);
       break;
+      //運算元直接輸出
       case '0' :
       case '1' :
       case '2' :
@@ -44,33 +89,32 @@ string infixToPostfix(string str , vector <int> postfix){
       case '7' :
       case '8' :
       case '9' :
-        
-        ans.push_back( str.at(i) );
-
+      	ans.push_back( str.at(i) );
       break;
-      case ')':
-        
-        int n=sta.size()-1;
-        while(sta.top() != '('){
-          sta.push( sta.top() );
-          sta.pop();
-        }
       
-        sta.pop();
-
+      case ')':
+      	backBracket(sta,ans);
       break;
     }
     
-
   }
-  return str;
+  
+  while(sta.top()!=NULL){
+  	ans.push_back(sta.top());
+  	sta.pop();
+  }
+  
+  string result(ans.begin(), ans.end());//vector <char> to string
+  return result;
 }
-
+//後敘式運算
 void postfixCalculate(string str){
   stack  <int> sta;
+  
   for(int i=0;i<str.length();i++){
     int a,b;
     switch( str.at(i) ){
+      //遇運算元直接推入堆疊
       case '0':
       case '1':
       case '2':
@@ -83,49 +127,33 @@ void postfixCalculate(string str){
       case '9':
         sta.push( str.at(i) - '0');
       break;
-
+      //遇運算子 推出堆疊上方兩個運算元做運算    
       case '+' :
-        a=sta.top();
-        sta.pop();
-        b=sta.top();
-        sta.pop();
-        sta.push( a+b );
-      break;
-
       case '-' :
-        a=sta.top();
-        sta.pop();
-        b=sta.top();
-        sta.pop();
-        sta.push( a-b );
-      break;
-
       case '*' :
-        a=sta.top();
-        sta.pop();
-        b=sta.top();
-        sta.pop();
-        sta.push( a*b );
-      break;
-
       case '/' :
         a=sta.top();
         sta.pop();
         b=sta.top();
         sta.pop();
-        sta.push( a/b );
-      break;      
-
+          case '+' :  
+            sta.push( a+b );
+          break;
+          case '-' :
+            sta.push( a-b );
+          break;
+          case '*' :
+            sta.push( a*b );
+          break;
+          case '/' :
+            sta.push( a/b );
+          break;      
     }
   }
   cout<<sta.top();
 }
 
-int main() {
-  string str="(1+2)*(3+4)";
-  vector <int> postfix;
-  infixToPostfix(str,postfix);
-
-  postfixCalculate(str);
-  return 0;  
+int main(){
+	string str=infixToPostfix("1+2*3");
+	postfixCalculate(str);
 }
