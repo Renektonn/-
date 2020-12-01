@@ -107,6 +107,16 @@ string infixToPostfix(string str){
   string result(ans.begin(), ans.end());//vector <char> to string
   return result;
 }
+
+int calculate(int a , int b , char op){
+	switch(op){
+		case '+' : return b+a;
+		case '-' : return b-a;
+		case '*' : return b*a;
+		case '/' : return b/a;
+	}
+}
+
 //後敘式運算
 void postfixCalculate(string str){
   stack  <int> sta;
@@ -136,18 +146,8 @@ void postfixCalculate(string str){
         sta.pop();
         b=sta.top();
         sta.pop();
-          case '+' :  
-            sta.push( a+b );
-          break;
-          case '-' :
-            sta.push( a-b );
-          break;
-          case '*' :
-            sta.push( a*b );
-          break;
-          case '/' :
-            sta.push( a/b );
-          break;      
+        sta.push( calculate(a , b , str.at(i) ) );
+	  break;	        
     }
   }
   cout<<sta.top();
